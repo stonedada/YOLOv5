@@ -26,8 +26,8 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
-        "model_path"        : 'model_data/yolov5_s.pth',
-        "classes_path"      : 'model_data/coco_classes.txt',
+        "model_path"        : 'logs/ep1800-loss0.026-val_loss0.099.pth',
+        "classes_path"      : 'model_data/cls_classes.txt',
         #---------------------------------------------------------------------#
         #   anchors_path代表先验框对应的txt文件，一般不修改。
         #   anchors_mask用于帮助代码找到对应的先验框，一般不修改。
@@ -49,7 +49,7 @@ class YOLO(object):
         #   所使用的YoloV5的版本。s、m、l、x
         #   在除cspdarknet的其它主干中仅影响panet的大小
         #------------------------------------------------------#
-        "phi"               : 's',
+        "phi"               : 'x',
         #---------------------------------------------------------------------#
         #   只有得分大于置信度的预测框会被保留下来
         #---------------------------------------------------------------------#
@@ -58,9 +58,9 @@ class YOLO(object):
         #   非极大抑制所用到的nms_iou大小
         #---------------------------------------------------------------------#
         "nms_iou"           : 0.3,
-        #---------------------------------------------------------------------#
-        #   该变量用于控制是否使用letterbox_image对输入图像进行不失真的resize，
-        #   在多次测试后，发现关闭letterbox_image直接resize的效果更好
+        #----------------------------该变量用于控制是否使用letterbox_image对输入图像进行不失真的resize，
+        #   在多次测试后，发现关闭letterbox_image直接resize的-----------------------------------------#
+        #   效果更好
         #---------------------------------------------------------------------#
         "letterbox_image"   : True,
         #-------------------------------#
@@ -582,6 +582,7 @@ class YOLO_ONNX(object):
         
                 new_image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(128, 128, 128))  # add border
             else:
+                w, h = size
                 new_image = cv2.resize(image, (w, h))
 
         return new_image

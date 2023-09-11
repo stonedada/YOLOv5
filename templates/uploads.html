@@ -6,8 +6,57 @@
   <body>
     <h1>上传图片</h1>
     <form method="POST" enctype="multipart/form-data">
-      <input type="file" name="file">
+      <input type="file" name="file" id="file-input" multiple onchange="previewImages()">
       <input type="submit" value="上传">
     </form>
+
+    <h1>图片显示</h1>
+<!--   <form>-->
+<!--        <input type="file" id="file-input" multiple onchange="previewImages()">-->
+<!--    </form>-->
+
+    <div id="image-preview">
+        <!-- 用于循环显示上传的图片的容器 -->
+    </div>
+    <script>
+        // JavaScript 函数，用于循环显示上传的图片
+        function previewImages() {
+            var preview = document.querySelector('#image-preview');
+            var fileInput = document.querySelector('#file-input');
+
+            // 清空现有的预览
+            preview.innerHTML = '';
+
+            var files = fileInput.files;
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var imageType = /image.*/;
+
+                if (!file.type.match(imageType)) {
+                    continue;
+                }
+
+                var img = document.createElement('img');
+                img.className = 'preview-image';
+                img.file = file;
+                preview.appendChild(img);
+
+                var reader = new FileReader();
+                reader.onload = (function(aImg) {
+                    return function(e) {
+                        aImg.src = e.target.result;
+                    };
+                })(img);
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+    <style>
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px;
+        }
+    </style>
   </body>
 </html>

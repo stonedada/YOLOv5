@@ -10,7 +10,31 @@ from PIL import Image
 
 from yolo import YOLO, YOLO_ONNX
 
-if __name__ == "__main__":
+
+def res(path):
+
+    mode = "predict"
+    crop = False
+    count = False
+    if mode != "predict_onnx":
+        yolo = YOLO()
+    else:
+        yolo = YOLO_ONNX()
+    if mode == "predict":
+
+        # while True:
+        img = path
+        try:
+            image = Image.open(img)
+        except:
+            print('Open Error! Try again!')
+            # continue
+        else:
+            r_image = yolo.detect_image(image, crop = crop, count=count)
+            r_image.save("static/img.jpg")
+            r_image.show()
+
+def test():
     #----------------------------------------------------------------------------------------------------------#
     #   mode用于指定测试的模式：
     #   'predict'           表示单张图片预测，如果想对预测过程进行修改，如保存图片，截取对象等，可以先看下方详细的注释
@@ -21,7 +45,7 @@ if __name__ == "__main__":
     #   'export_onnx'       表示将模型导出为onnx，需要pytorch1.7.1以上。
     #   'predict_onnx'      表示利用导出的onnx模型进行预测，相关参数的修改在yolo.py_423行左右处的YOLO_ONNX
     #----------------------------------------------------------------------------------------------------------#
-    mode = "predict"
+    mode = "video"
     #-------------------------------------------------------------------------#
     #   crop                指定了是否在单张图片预测后对目标进行截取
     #   count               指定了是否进行目标的计数
@@ -39,8 +63,8 @@ if __name__ == "__main__":
     #   video_path、video_save_path和video_fps仅在mode='video'时有效
     #   保存视频时需要ctrl+c退出或者运行到最后一帧才会完成完整的保存步骤。
     #----------------------------------------------------------------------------------------------------------#
-    video_path      = 0
-    video_save_path = ""
+    video_path      = 'img/demo.mp4'
+    video_save_path = "img/demo_out.mp4"
     video_fps       = 25.0
     #----------------------------------------------------------------------------------------------------------#
     #   test_interval       用于指定测量fps的时候，图片检测的次数。理论上test_interval越大，fps越准确。
@@ -56,8 +80,8 @@ if __name__ == "__main__":
     #   
     #   dir_origin_path和dir_save_path仅在mode='dir_predict'时有效
     #-------------------------------------------------------------------------#
-    dir_origin_path = "img/"
-    dir_save_path   = "img_out/"
+    dir_origin_path = "img/test_2"
+    dir_save_path   = "prediction/out_3"
     #-------------------------------------------------------------------------#
     #   heatmap_save_path   热力图的保存路径，默认保存在model_data下
     #   
@@ -94,12 +118,13 @@ if __name__ == "__main__":
                 continue
             else:
                 r_image = yolo.detect_image(image, crop = crop, count=count)
+                r_image.save("img.jpg")
                 r_image.show()
 
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
         if video_save_path!="":
-            fourcc  = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc  = cv2.VideoWriter_fourcc(*'mp4v')
             size    = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
             out     = cv2.VideoWriter(video_save_path, fourcc, video_fps, size)
 
@@ -127,14 +152,14 @@ if __name__ == "__main__":
             print("fps= %.2f"%(fps))
             frame = cv2.putText(frame, "fps= %.2f"%(fps), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             
-            cv2.imshow("video",frame)
-            c= cv2.waitKey(1) & 0xff 
+            # cv2.imshow("video",frame)
+            # c= cv2.waitKey(1) & 0xff
             if video_save_path!="":
                 out.write(frame)
 
-            if c==27:
-                capture.release()
-                break
+            # if c==27:
+            #     capture.release()
+            #     break
 
         print("Video Detection Done!")
         capture.release()

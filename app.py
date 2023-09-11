@@ -1,10 +1,11 @@
 from flask import Flask, request, render_template, redirect, url_for
+import predict
 import os
 
 app = Flask(__name__)
 
 # 上传文件存储目录
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = './uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # 允许上传的文件类型
@@ -33,14 +34,20 @@ def upload_file():
         if file and allowed_file(file.filename):
             # 保存文件到指定目录
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(filename)
+            print(filename)
+            file.save("./uploads/"+file.filename)
 
             # 在这里可以添加处理上传文件的代码，例如调用深度学习模型进行图像分析
-
-            return '文件上传成功'
+            predict.res("./uploads/"+file.filename)
+            return redirect('/tl')
 
     return render_template('uploads.html')
 
+@app.route('/tl', methods=['GET', 'POST'])
+def tl_file():
+    # 使用url_for生成静态文件的URL
+    image_url = url_for('static', filename='img.jpg')
+    return render_template('tl_res.html', image_url=image_url)
 
 if __name__ == '__main__':
     app.run(debug=True)
